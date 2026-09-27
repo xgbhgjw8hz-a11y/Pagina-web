@@ -1,45 +1,44 @@
+let productos = [];
 
-const productos = [
-    {
-        nombre: "audifonos bluetooth",
-        precio: "$29.99",
-        imagen: "https://via.placeholder.com/150?text=Audifonos"
-    },
-    {
-        nombre: "Zapatillas deportivas",
-        precio: "$59.99",
-        imagen: "https://via.placeholder.com/150?text=Zapatillas"
-    },
-    {
-        nombre: "camiseta urbana",
-        precio: "$19.99",
-        imagen: "https://via.placeholder.com/150?text=Camiseta"
-    },
-    {
-        nombre: "reloj inteligente",
-        precio: "$89.99",
-        imagen: "https://via.placeholder.com/150?text=Smartwatch"
+async function cargarProductos() {
+    try {
+        const respuesta = await fetch("productos.json");
+        productos = await respuesta.json();
+        console.log("productos cargados desde el json con exito", productos);
+    }catch(error) {
+        console.error("error al cargar archivo Json:", error )
     }
-];
-
-const searchInput = document.getElementById("searchInput");
-const searchButton = document.getElementById("searchButton");
-const searchResult = document.getElementById("searchResult");
-
-function realizarBusqueda() {
-    const termino = searchInput.value.trim().toLowerCase();
-    searchResult.innerHTML = '<p class="mensaje-alerta">⚠️ Por favor, ingresa un término de búsqueda.</p>';
-    
-
-
-if (productosFiltrados.lenght === 0) {
-    searchResult.innerHTML = `<p class="mensaje-alerta">❌ No se encontraron productos para "${termino}".</p>`;
-    return;
 }
 
-productosFiltrados.forEach(function(producto) {
-    const tarjeta = document.createElement("div");
-    tarjeta.classList.add("card-producto");
+cargarProductos();
+
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+const searchResult = document.getElementById('searchResult');
+
+// 3. FUNCIÓN DE BÚSQUEDA
+function realizarBusqueda() {
+  const termino = searchInput.value.trim().toLowerCase();
+  searchResult.innerHTML = '';
+
+  if (termino === '') {
+    searchResult.innerHTML = '<p class="mensaje-alerta">⚠️ Por favor, ingresa un término de búsqueda.</p>';
+    return;
+  }
+
+  // Filtramos sobre el array 'productos' que llenamos con el JSON
+  const productosFiltrados = productos.filter(function (producto) {
+    return producto.nombre.toLowerCase().includes(termino);
+  });
+
+  if (productosFiltrados.length === 0) {
+    searchResult.innerHTML = `<p class="mensaje-alerta">❌ No se encontraron productos para "${termino}".</p>`;
+    return;
+  }
+
+  productosFiltrados.forEach(function (producto) {
+    const tarjeta = document.createElement('div');
+    tarjeta.classList.add('card-producto');
 
     tarjeta.innerHTML = `
       <img src="${producto.imagen}" alt="${producto.nombre}">
@@ -49,13 +48,14 @@ productosFiltrados.forEach(function(producto) {
     `;
 
     searchResult.appendChild(tarjeta);
-   });
+  });
 }
 
-searchButton.addEventListener("click", realizarBusqueda);
+// 4. EVENTOS
+searchButton.addEventListener('click', realizarBusqueda);
 
-searchInput.addEventListener("keypress", function (event) {
-    if (event.key === "enter") {
-        realizarBusqueda();
-    }
+searchInput.addEventListener('keypress', function (event) {
+  if (event.key === 'Enter') {
+    realizarBusqueda();
+  }
 });
